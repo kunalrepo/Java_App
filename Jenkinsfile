@@ -6,7 +6,10 @@ stages {
     {
         steps{
             script {
-                git branch: 'main', url: 'https://github.com/kunalrepo/Java_App.git'
+                gitCheckout {
+                    branch: "main",
+                    url: "https://github.com/kunalrepo/Java_App.git"
+                }
         }
     }
 }
