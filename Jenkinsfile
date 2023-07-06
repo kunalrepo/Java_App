@@ -18,7 +18,6 @@ pipeline{
                  }
             steps{
                 script{
-                    // this is fetching from shared library grrovy scripts
                     gitCheckout(branch: "main", url: "https://github.com/kunalrepo/Java_App.git")
                 }
             }
