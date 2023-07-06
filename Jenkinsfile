@@ -5,12 +5,18 @@ pipeline{
 
     stages {
         stage('gitCheckout') {
-            steps {
-                script {
+            steps{
+                script{
                     gitCheckout(branch: "main", url: "https://github.com/kunalrepo/Java_App.git")
                 }
             }
         }
-        // Add more stages as needed
+        stage('Unit Test Maven') {
+            steps{
+                script{
+                   mvnTest()
+                }
+            }
+        }
     }
 }
