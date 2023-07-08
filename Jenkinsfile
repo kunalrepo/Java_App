@@ -71,7 +71,7 @@ pipeline{
             steps{
                 script{
                     // pass credentials define in staticcode analysis groovy file #shared library
-                    def SonarqubecredentialsId = 'sonar-api'
+                    def SonarqubecredentialsId = 'sonar-api1'
                    QualityGateStatus(SonarqubecredentialsId)
                 }
             }
