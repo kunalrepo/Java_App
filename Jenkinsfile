@@ -62,5 +62,20 @@ pipeline{
                 }
             }
         }
+        stage('QualityGate Status: SonarQube') {
+            when{
+            expression{
+                params.action == 'create'
+                      }
+                 }
+            steps{
+                script{
+                    // pass credentials define in staticcode analysis groovy file #shared library
+                    def SonarqubecredentialsId = 'sonar-api'
+                   QualityGateStatus(SonarqubecredentialsId)
+                }
+            }
+        }
     }
+
 }
