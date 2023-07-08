@@ -85,7 +85,7 @@ pipeline{
                  }
             steps{
                 script{
-                    mavBuild()
+                    mvnBuild()
                 }
             }
         }
