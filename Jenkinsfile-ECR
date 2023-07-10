@@ -1,144 +1,150 @@
 @Library('my-shared-library') _
 
-pipeline{
-    agent any
+pipeline {
+  agent any
 
-    // add parameters
-    parameters{
-        choice(name: 'action', choices: 'create\ndelete' , description: 'choose create/distroy')
-        string(name: 'aws_account_id', description: 'AWS Account ID', defaultValue: '967427159842')
-        string(name: 'Region', description: 'ECR region', defaultValue: 'ap-south-1')
-        string(name: 'ECR_Repo_Name', description: 'Name of the ECR_REP', defaultValue: 'kunaldockerclub')
+  parameters {
+    choice(name: 'action', choices: 'create\ndelete', description: 'Choose create/destroy')
+    string(name: 'aws_account_id', description: 'AWS Account ID', defaultValue: '967427159842')
+    string(name: 'Region', description: 'ECR region', defaultValue: 'ap-south-1')
+    string(name: 'ECR_Repo_Name', description: 'Name of the ECR_REP', defaultValue: 'kunaldockerclub')
+  }
+
+  stages {
+    stage('gitCheckout') {
+      when {
+        expression {
+          params.action == 'create'
+        }
+      }
+      steps {
+        script {
+          gitCheckout(branch: "main", url: "https://github.com/kunalrepo/Java_App.git")
+        }
+      }
     }
 
-    stages {
-       
-        stage('gitCheckout') {
-            when{
-            expression{
-                params.action == 'create'
-                      }
-                 }
-            steps{
-                script{
-                    gitCheckout(branch: "main", url: "https://github.com/kunalrepo/Java_App.git")
-                }
-            }
+    stage('Unit Test Maven') {
+      when {
+        expression {
+          params.action == 'create'
         }
-        stage('Unit Test Maven') {
-            when{
-            expression{
-                params.action == 'create'
-                      }
-                 }
-            steps{
-                script{
-                    // first install maven inside the jenkins server using maven scrip from install scripts repo
-                   mvnTest()
-                }
-            }
+      }
+      steps {
+        script {
+          mvnTest()
         }
-        stage('Integration Test Maven') {
-            when{
-            expression{
-                params.action == 'create'
-                      }
-                 }
-            steps{
-                script{
-                    
-                   mvnIntegrationTest()
-                }
-            }
-        }
-         stage('Static Code Analysis: SonarQube') {
-            when{
-            expression{
-                params.action == 'create'
-                      }
-                 }
-            steps{
-                script{
-                    // pass credentials define in staticcode analysis groovy file #shared library
-                    def SonarqubecredentialsId = 'sonar-api1'
-                   statiCodeAnalysis(SonarqubecredentialsId)
-                }
-            }
-        }
-        stage('QualityGate Status: SonarQube') {
-            when{
-            expression{
-                params.action == 'create'
-                      }
-                 }
-            steps{
-                script{
-                    // pass credentials define in staticcode analysis groovy file #shared library
-                    def SonarqubecredentialsId = 'sonar-api1'
-                   QualityGateStatus(SonarqubecredentialsId)
-                }
-            }
-        }
-
-        stage('Maven Build: maven') {
-            when{
-            expression{
-                params.action == 'create'
-                      }
-                 }
-            steps{
-                script{
-                    mvnBuild()
-                }
-            }
-        }
-        stage('Docker Image Build: ECR') {
-            when{
-            expression{
-                params.action == 'create'
-                      }
-                 }
-            steps{
-                script{
-                    dockerBuild("${params.aws_account_id}", "${params.Region}", "${params.ECR_Repo_Name}")
-                }
-            }
-        }
-        stage('Docker Image Scan: trivy') {
-            when{
-            expression{
-                params.action == 'create'
-                      }
-                 }
-            steps{
-                script{
-                    dockerImageScan("${params.aws_account_id}", "${params.Region}", "${params.ECR_Repo_Name}")
-                }
-            }
-        }
-        stage('Docker Image Push: ECR') {
-            when{
-            expression{
-                params.action == 'create'
-                      }
-                 }
-            steps{
-                script{
-                    dockerImagePush("${params.aws_account_id}", "${params.Region}", "${params.ECR_Repo_Name}")
-                }
-            }
-        }
-        stage('Docker Image Cleanup: ECR') {
-            when{
-            expression{
-                params.action == 'create'
-                      }
-                 }
-            steps{
-                script{
-                    dockerImageCleanup("${params.aws_account_id}", "${params.Region}", "${params.ECR_Repo_Name}")
-                }
-            }
-        }
+      }
     }
+
+    stage('Integration Test Maven') {
+      when {
+        expression {
+          params.action == 'create'
+        }
+      }
+      steps {
+        script {
+          mvnIntegrationTest()
+        }
+      }
+    }
+
+    stage('Static Code Analysis: SonarQube') {
+      when {
+        expression {
+          params.action == 'create'
+        }
+      }
+      steps {
+        script {
+          def SonarqubecredentialsId = 'sonar-api1'
+          statiCodeAnalysis(SonarqubecredentialsId)
+        }
+      }
+    }
+
+    stage('QualityGate Status: SonarQube') {
+      when {
+        expression {
+          params.action == 'create'
+        }
+      }
+      steps {
+        script {
+          def SonarqubecredentialsId = 'sonar-api1'
+          QualityGateStatus(SonarqubecredentialsId)
+        }
+      }
+    }
+
+    stage('Maven Build: maven') {
+      when {
+        expression {
+          params.action == 'create'
+        }
+      }
+      steps {
+        script {
+          mvnBuild()
+        }
+      }
+    }
+
+    stage('Docker Image Build: ECR') {
+      when {
+        expression {
+          params.action == 'create'
+        }
+      }
+      steps {
+        script {
+          dockerBuild("${params.aws_account_id}", "${params.Region}", "${params.ECR_Repo_Name}")
+        }
+      }
+    }
+
+    stage('Docker Image Scan: trivy') {
+      when {
+        expression {
+          params.action == 'create'
+        }
+      }
+      steps {
+        script {
+          dockerImageScan("${params.aws_account_id}", "${params.Region}", "${params.ECR_Repo_Name}")
+        }
+      }
+    }
+
+    stage('Docker Image Push: ECR') {
+      when {
+        expression {
+          params.action == 'create'
+        }
+      }
+      steps {
+        script {
+          def loginCommand = sh(script: "aws ecr get-login-password --region ${params.Region}", returnStdout: true).trim()
+          echo "Logging in to Docker..."
+          sh "echo '${loginCommand}' | docker login --username AWS --password-stdin ${params.aws_account_id}.dkr.ecr.${params.Region}.amazonaws.com"
+          echo "Pushing Docker image to ECR..."
+          sh "docker push ${params.aws_account_id}.dkr.ecr.${params.Region}.amazonaws.com/${params.ECR_Repo_Name}"
+        }
+      }
+    }
+
+    stage('Docker Image Cleanup: ECR') {
+      when {
+        expression {
+          params.action == 'create'
+        }
+      }
+      steps {
+        script {
+          dockerImageCleanup("${params.aws_account_id}", "${params.Region}", "${params.ECR_Repo_Name}")
+        }
+      }
+    }
+  }
 }
