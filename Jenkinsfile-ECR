@@ -124,15 +124,25 @@ pipeline {
         }
       }
       steps {
-        script {
-          def loginCommand = sh(script: "aws ecr get-login-password --region ${params.Region}", returnStdout: true).trim()
-          echo "Logging in to Docker..."
-          sh "echo '${loginCommand}' | docker login --username AWS --password-stdin ${params.aws_account_id}.dkr.ecr.${params.Region}.amazonaws.com"
-          echo "Pushing Docker image to ECR..."
-          sh "docker push ${params.aws_account_id}.dkr.ecr.${params.Region}.amazonaws.com/${params.ECR_Repo_Name}"
+            script {
+               withCredentials([
+               usernamePassword(
+               credentialsId: 'aws-credentials', // ID of your AWS credentials in Jenkins credentials store
+               usernameVariable: 'AWS_ACCESS_KEY_ID',
+               passwordVariable: 'AWS_SECRET_ACCESS_KEY'
+               )
+               ]
+               ) 
+               {
+                 def loginCommand = sh(script: "aws ecr get-login-password --region ${params.Region}", returnStdout: true).trim()
+                 echo "Logging in to Docker..."
+                 sh "echo '${loginCommand}' | docker login --username AWS --password-stdin ${params.aws_account_id}.dkr.ecr.${params.Region}.amazonaws.com"
+                 echo "Pushing Docker image to ECR..."
+                 sh "docker push ${params.aws_account_id}.dkr.ecr.${params.Region}.amazonaws.com/${params.ECR_Repo_Name}"
+               }
+                    }
+            }
         }
-      }
-    }
 
     stage('Docker Image Cleanup: ECR') {
       when {
