@@ -128,7 +128,7 @@ pipeline{
                 }
             }
         }
-        tage('Docker Image Cleanup: DockerHub') {
+        stage('Docker Image Cleanup: DockerHub') {
             when{
             expression{
                 params.action == 'create'
