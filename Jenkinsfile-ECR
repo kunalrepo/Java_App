@@ -98,10 +98,10 @@ pipeline{
                }
             }
         }
-       stage('Docker Image Push: ECR') {
+     stage('Docker Image Push: ECR') {
    when { expression { params.action == 'create' } }
    steps {
-    withAWS(region: "${params.Region}", credentials: "${params.CredentialID}") {
+      withAWS(region: "${params.Region}", credentials: "${params.CredentialID}") {
          withCredentials([string(credentialsId: "${params.CredentialID}", variable: 'AWS_CREDENTIALS')]) {
             script {
                // Perform Docker image push to ECR using masked credentials
