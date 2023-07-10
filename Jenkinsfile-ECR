@@ -127,7 +127,7 @@ pipeline {
             script {
                withCredentials([
                usernamePassword(
-               credentialsId: 'aws-credentials', // ID of your AWS credentials in Jenkins credentials store
+            //    credentialsId: 'aws-credentials', // ID of your AWS credentials in Jenkins credentials store
                usernameVariable: 'AWS_ACCESS_KEY_ID',
                passwordVariable: 'AWS_SECRET_ACCESS_KEY'
                )
