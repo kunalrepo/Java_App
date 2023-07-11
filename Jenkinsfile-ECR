@@ -12,8 +12,8 @@ pipeline {
     }
 
     environment {
-        ACCESS_KEY = credentials('AWS_Credentials').username
-        SECRET_KEY = credentials('AWS_Credentials').password
+        ACCESS_KEY = credentials('aws_credentials').username
+        SECRET_KEY = credentials('aws_credentials').password
     }
 
     stages {
@@ -111,7 +111,7 @@ pipeline {
             }
             steps {
                 script {
-                    withCredentials([string(credentialsId: 'AWS_Credentials', variable: 'AWS_CREDENTIALS')]) {
+                    withCredentials([string(credentialsId: 'aws_credentials', variable: 'AWS_CREDENTIALS')]) {
                 dockerImagePush("${env.AWS_CREDENTIALS}", "${params.Region}", "${params.ecr_repoName}")
                 }
             }
