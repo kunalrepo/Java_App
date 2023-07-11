@@ -107,7 +107,7 @@ pipeline {
             }
         }
 
-        sstage('Docker Image Push: AWS ECR') {
+        stage('Docker Image Push: AWS ECR') {
             when {
                 expression { params.action == 'create' }
             }
