@@ -10,9 +10,9 @@ pipeline {
         string(name: 'ecr_repoName', description: "Name of the ECR", defaultValue: 'kunaldokerclub')
     }
 
-    environment {
-        ACCESS_KEY = credentials('AWS_Creds').username
-        SECRET_KEY = credentials('AWS_Creds').password
+   environment {
+        ACCESS_KEY = credentials('AWS_Creds').username.toString()
+        SECRET_KEY = credentials('AWS_Creds').password.toString()
     }
 
     stages {
