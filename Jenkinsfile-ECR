@@ -107,17 +107,17 @@ pipeline {
             }
         }
 
-        stage('Docker Image Push: AWS ECR') {
+        sstage('Docker Image Push: AWS ECR') {
             when {
                 expression { params.action == 'create' }
             }
             steps {
                 script {
                     withCredentials([
-                        string(credentialsId: 'AWS_Creds', variable: 'AWS_ACCESS_KEY'),
-                        string(credentialsId: 'AWS_Creds', variable: 'AWS_SECRET_KEY')
+                        string(credentialsId: 'AWS_Creds', variable: 'ACCESS_KEY'),
+                        string(credentialsId: 'AWS_Creds', variable: 'SECRET_KEY')
                     ]) {
-                        dockerImagePush(env.AWS_ACCESS_KEY, env.AWS_SECRET_KEY, "${params.Region}", "${params.ecr_repoName}")
+                        dockerImagePush(env.ACCESS_KEY, env.SECRET_KEY, "${params.Region}", "${params.ecr_repoName}")
                     }
                 }
             }
