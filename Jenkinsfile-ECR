@@ -11,9 +11,10 @@ pipeline {
     }
 
    environment {
-        ACCESS_KEY = credentials('AWS_Creds').username.toString()
-        SECRET_KEY = credentials('AWS_Creds').password.toString()
-    }
+    ACCESS_KEY = credentials('AWS_Creds').username
+    SECRET_KEY = credentials('AWS_Creds').password.getPlainPassword()
+}
+
 
     stages {
         stage('Git Checkout: GitHub') {
