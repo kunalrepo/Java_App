@@ -111,7 +111,11 @@ pipeline {
             }
             steps {
                 script {
-                    withCredentials([string(credentialsId: 'aws_credentials', variable: 'AWS_CREDENTIALS')]) {
+                    withCredentials([
+                     string(credentialsId: 'aws_credentials', variable: 'AWS_ACCESS_KEY'),
+                     string(credentialsId: 'aws_credentials', variable: 'AWS_SECRET_KEY')
+            ]) 
+                {
                 dockerImagePush("${env.AWS_CREDENTIALS}", "${params.Region}", "${params.ecr_repoName}")
                 }
             }
