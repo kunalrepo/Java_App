@@ -12,13 +12,12 @@ pipeline {
     }
 
     environment {
-        registory = "967427159842.dkr.ecr.ap-south-1.amazonaws.com/kunaldockerclub"
-        ACCESS_KEY = credentials('AWS_ACCESS_KEY_ID')
-        SECRET_KEY = credentials('AWS_SECRET_KEY_ID')
+        ACCESS_KEY = credentials('AWS_Credentials').username
+        SECRET_KEY = credentials('AWS_Credentials').password
     }
 
     stages {
-        stage('Git Checkout') {
+        stage('Git Checkout : GitHub') {
             when {
                 expression { params.action == 'create' }
             }
@@ -27,7 +26,7 @@ pipeline {
             }
         }
 
-        stage('Unit Test maven') {
+        stage('Unit Test : Maven') {
             when {
                 expression { params.action == 'create' }
             }
@@ -38,7 +37,7 @@ pipeline {
             }
         }
 
-        stage('Integration Test maven') {
+        stage('Integration Test : Maven') {
             when {
                 expression { params.action == 'create' }
             }
@@ -49,7 +48,7 @@ pipeline {
             }
         }
 
-        stage('Static code analysis: Sonarqube') {
+        stage('Static Code Analysis: Sonarqube') {
             when {
                 expression { params.action == 'create' }
             }
@@ -73,7 +72,7 @@ pipeline {
             }
         }
 
-        stage('Maven Build: maven') {
+        stage('Maven Build: Maven') {
             when {
                 expression { params.action == 'create' }
             }
@@ -84,7 +83,7 @@ pipeline {
             }
         }
 
-        stage('Docker Image Build: ECR') {
+        stage('Docker Image Build: AWS ECR') {
             when {
                 expression { params.action == 'create' }
             }
@@ -95,7 +94,7 @@ pipeline {
             }
         }
 
-        stage('Docker Image Scan: trivy') {
+        stage('Docker Image Scan: Trivy') {
             when {
                 expression { params.action == 'create' }
             }
@@ -106,18 +105,19 @@ pipeline {
             }
         }
 
-        stage('Docker Image Push: ECR') {
+        stage('Docker Image Push: AWS ECR') {
             when {
                 expression { params.action == 'create' }
             }
             steps {
                 script {
-                    dockerImagePush("${params.aws_account_id}", "${params.Region}", "${params.ecr_repoName}")
+                    withCredentials([string(credentialsId: 'AWS_Credentials', variable: 'AWS_CREDENTIALS')]) {
+                dockerImagePush("${env.AWS_CREDENTIALS}", "${params.Region}", "${params.ecr_repoName}")
                 }
             }
         }
 
-        stage('Docker Image Cleanup: ECR') {
+        stage('Docker Image Cleanup: AWS ECR') {
             when {
                 expression { params.action == 'create' }
             }
@@ -128,4 +128,5 @@ pipeline {
             }
         }
     }
+}
 }
