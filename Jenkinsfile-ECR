@@ -11,9 +11,9 @@ pipeline {
     }
 
    environment {
-    ACCESS_KEY = credentials('AWS_Creds').username
-    SECRET_KEY = credentials('AWS_Creds').password.getPlainPassword()
-}
+        ACCESS_KEY = credentials('AWS_Creds').username
+        SECRET_KEY = credentials('AWS_Creds').password.getPlainPassword()
+    }
 
 
     stages {
